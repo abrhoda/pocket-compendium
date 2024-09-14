@@ -1,27 +1,34 @@
 package com.github.abrhoda.dice;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Dice {
     private static final Random random = new Random();
 
-    public void roll(String input) {
+    /**
+     * Evaluate a very simple dice notation string. It must follow {count}d{sides} (called a dice expression) and any
+     * number of constants. The only operations supported at +/- for now.
+     *
+     * @param input very dice notation string.
+     * @return sum of the dice notation string or 0 if invalid.
+     */
+    // TODO use OptionalInt instead of int and returning a 0.
+    public int roll(String input) {
         List<Token> tokens = tokenize(input);
         if (tokens == null || tokens.isEmpty()) {
-            return;
+            return 0;
         }
 
-        int acc = 0;
+        int total = 0;
         boolean shouldAdd = true;
         for (Token token : tokens) {
             switch (token.tokenType()) {
                 case CONSTANT, DICE_EXPRESSION: {
                     int sum = sum(token);
                     if (shouldAdd) {
-                        acc += sum;
+                        total += sum;
                     } else {
-                        acc -= sum;
+                        total -= sum;
                     }
                     break;
                 }
@@ -31,7 +38,7 @@ public class Dice {
                 }
             }
         }
-        System.out.printf("Total is %d%n", acc);
+        return total;
     }
     /**
      * Splits the dice notation string into a list of tokens.
@@ -43,6 +50,7 @@ public class Dice {
      * @param rawInput the full dice notation to be split into tokens.
      * @return list of parsed Tokens
      */
+    // TODO use Optional instead of null
     private List<Token> tokenize(String rawInput) {
         if (rawInput == null || rawInput.isBlank()) {
             return null;
@@ -82,7 +90,6 @@ public class Dice {
 
         // TODO This should validate the DICE_EXPRESSION type and return an Optional<Token> instead of just Token for when the chunk isn't a valid token.
         return new Token(chunk, TokenType.DICE_EXPRESSION);
-
     }
 
     /**
@@ -117,7 +124,6 @@ public class Dice {
              int j = (random.nextInt(sides) + 1);
              rolls[i] = j;
          }
-
          return rolls;
     }
 }
