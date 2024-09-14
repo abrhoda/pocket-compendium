@@ -4,6 +4,7 @@ import com.github.abrhoda.dice.Dice;
 
 public class Main {
     public static void main(String[] args){
-        Dice.roll("   3d4 + 3 + 12d6 \t");
+        Dice dice = new Dice();
+        dice.roll("   3d6 + 6 - 1d4 \t");
     }
 }
