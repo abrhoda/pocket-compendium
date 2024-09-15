@@ -1,6 +1,7 @@
 package com.github.abrhoda.dice;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Dice {
     private static final Random random = new Random();
@@ -55,14 +56,14 @@ public class Dice {
         if (rawInput == null || rawInput.isBlank()) {
             return null;
         }
-
         String sanitized = rawInput.replaceAll("\\s+","");
+
         List<Token> tokens = new ArrayList<>();
         int start = 0;
         int current = 0;
         while (current < sanitized.length()) {
             char c = sanitized.charAt(current);
-            if (c == '+' || c == '-') {
+            if ((c == '+' || c == '-') && (start != current)) {
                 tokens.add(getTokenFromChunk(sanitized.substring(start, current)));
                 tokens.add(getTokenFromChunk(String.valueOf(c)));
                 start = current + 1;
@@ -103,27 +104,30 @@ public class Dice {
             return Integer.parseInt(token.value());
         }
 
-        return Arrays.stream(evaluateDiceExpression(token.value())).sum();
+        return evaluateDiceExpression(token.value()).stream().mapToInt(Integer::intValue).sum();
     }
 
     /**
      * Evaluates dice expression string (of {count}{d}{sides} syntax without the braces) into an array of rolls.
      *
      * @param diceExpression string dice notation that needs to be evaluated for a set of rolls.
-     * @return an array of the individual rolls made for the dice expression
+     * @return a list of the individual rolls made for the dice expression or empty list if the expression has 0 count
+     *         or 0 sides
      */
-     private int[] evaluateDiceExpression(String diceExpression) {
+     private List<Integer> evaluateDiceExpression(String diceExpression) {
          int index = diceExpression.toLowerCase().indexOf('d');
+         if (index == -1 || (index == diceExpression.length()-1)) {
+             return List.of();
+         }
 
          // these have been validated for format so ignoring `NumberFormatException`
-         int count = Integer.parseInt(diceExpression.substring(0, index));
+         int count = (index == 0) ? 1 : Integer.parseInt(diceExpression.substring(0, index));
          int sides = Integer.parseInt(diceExpression.substring(index+1));
 
-         int[] rolls = new int[count];
-         for (int i=0; i<count; ++i) {
-             int j = (random.nextInt(sides) + 1);
-             rolls[i] = j;
+         if (count == 0 || sides == 0) {
+             return List.of();
          }
-         return rolls;
+
+         return IntStream.generate(() -> random.nextInt(sides)+1).limit(count).boxed().toList();
     }
 }
