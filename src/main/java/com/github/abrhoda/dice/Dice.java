@@ -5,6 +5,7 @@ import java.util.stream.IntStream;
 
 public class Dice {
     private static final Random random = new Random();
+    private final Parser parser = new Parser();
 
     /**
      * Evaluate a very simple dice notation string. It must follow {count}d{sides} (called a dice expression) and any

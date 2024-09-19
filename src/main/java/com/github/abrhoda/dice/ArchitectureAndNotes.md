@@ -1,17 +1,14 @@
 1. Dice class has a roll method. This is a class because its stateful.
 2. `private static final Parser`:
-   1. takes raw input string, does some minor validations, and then sanitizes (remove whitespace)
-   2. validate the individual tokens
-   2. Generate AST (currently a list for LR parsing)
-
-   3. Evaluate dice expressions in the AST
-   4. walk tree and sum.
+   1. take string and split into proper tokens.
+   2. validate each token (are dice expressions valid)
+   3. convert to postfix notation (this is our `AST`)
 3. `public class Dice`:
    1. has `private static final Parser` field
    2. has a roll method, which is public and returns an int
    3. roll method takes raw input string, does some minor validations, and then sanitizes (remove whitespace)
    4. calls the parser's tokenize/parse method and generates "tokens" for each statement.
-   5. parser builds AST from these tokens
+   5. parser builds AST from these tokens (in this case it'll just be a postfix notation queue with the tokens)
    6. dice class's evaluate method takes this AST and outputs an int which is returns to the caller.
 
 
